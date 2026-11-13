@@ -3,6 +3,7 @@
 import Phaser from "phaser";
 import type { Cell, GameEvent, GameState, Terrain } from "../../core/mod.ts";
 import { Item, terrainAt } from "../../core/mod.ts";
+import { itemAt } from "../../core/terrain.ts";
 
 export const CELL_SIZE = 32;
 const VIEW_WIDTH = 800;
@@ -18,6 +19,14 @@ const TERRAIN_COLORS: Record<Terrain, number> = {
   forest: 0x2f6b3a,
   water: 0x2d5f9e,
   rock: 0x6e6a66,
+};
+
+const ITEM_COLORS: Record<Item, number> = {
+  bug: 0xff0000,
+  stick: 0xff8800,
+  leaf: 0x00ff00,
+  gem: 0x0000ff,
+  fish: 0x00ffff,
 };
 
 // Enough cells to cover the view, plus a margin so that the camera can lag behind
@@ -144,6 +153,16 @@ export class GridView extends Phaser.Scene {
           CELL_SIZE - 1,
           CELL_SIZE - 1,
         );
+
+        const item = itemAt(this.seed, x, y);
+        if (item) {
+          this.ground.fillStyle(ITEM_COLORS[item]);
+          this.ground.fillCircle(
+            x * CELL_SIZE + (CELL_SIZE / 2),
+            y * CELL_SIZE + (CELL_SIZE / 2),
+            CELL_SIZE / 4,
+          );
+        }
       }
     }
   }

@@ -5,7 +5,7 @@ export type Terrain = "grass" | "forest" | "water" | "rock";
 
 export type Item = "bug" | "stick" | "leaf" | "gem" | "fish";
 
-const _TERRAIN_ITEMS: Record<Terrain, Item[]> = {
+const TERRAIN_ITEMS: Record<Terrain, Item[]> = {
   grass: ["bug"],
   forest: ["stick", "leaf"],
   rock: ["gem"],
@@ -20,6 +20,12 @@ export function terrainAt(seed: number, x: number, y: number): Terrain {
   if (height < 0.3) return "water";
   if (height > 0.7) return "rock";
   return noise(seed + 2, x, y, 6) < 0.45 ? "forest" : "grass";
+}
+
+export function itemAt(seed: number, x: number, y: number): Item | undefined {
+  const terrain = terrainAt(seed, x, y);
+
+  if (noise(seed + 1, x, y, 1) < 0.05) return TERRAIN_ITEMS[terrain][0];
 }
 
 export function isPassable(terrain: Terrain): boolean {
