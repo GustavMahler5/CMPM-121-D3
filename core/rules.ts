@@ -2,7 +2,7 @@
 // once, and the events it returns are a record of what happened. Whoever called
 // apply() decides how, or whether, to show them over time.
 
-import { isPassable, type Terrain, terrainAt } from "./terrain.ts";
+import { isPassable, Item, type Terrain, terrainAt } from "./terrain.ts";
 
 export type Cell = { x: number; y: number };
 
@@ -13,15 +13,21 @@ export type Direction = "north" | "south" | "east" | "west";
 export type GameState = {
   seed: number;
   player: Cell;
+  inventory: Item[];
+  gatheredCells: Cell[];
 };
 
 // Command: https://gameprogrammingpatterns.com/command.html
-export type Command = { type: "move"; direction: Direction };
+export type Command =
+  | { type: "move"; direction: Direction }
+  | { type: "gather"; item: Item };
 
 // Domain Event: https://martinfowler.com/eaaDev/DomainEvent.html
 export type GameEvent =
   | { type: "moved"; from: Cell; to: Cell }
-  | { type: "blocked"; at: Cell; toward: Cell; terrain: Terrain };
+  | { type: "blocked"; at: Cell; toward: Cell; terrain: Terrain }
+  | { type: "gathered"; item: Item; at: Cell }
+  | { type: "already gathered"; item: Item; at: Cell };
 
 const STEPS: Record<Direction, Cell> = {
   north: { x: 0, y: -1 },
@@ -32,7 +38,7 @@ const STEPS: Record<Direction, Cell> = {
 
 // Singleton, avoided on purpose: tests make as many games as they need. https://gameprogrammingpatterns.com/singleton.html
 export function newGame(seed: number): GameState {
-  return { seed, player: { x: 0, y: 0 } };
+  return { seed, player: { x: 0, y: 0 }, inventory: [], gatheredCells: [] };
 }
 
 // The single way in. It updates the state it is given and returns the events.
@@ -40,7 +46,22 @@ export function apply(state: GameState, command: Command): GameEvent[] {
   switch (command.type) {
     case "move":
       return move(state, command.direction);
+    case "gather":
+      return gather(state, command.item);
   }
+}
+
+function gather(state: GameState, item: Item): GameEvent[] {
+  const alreadyHasItem = state.gatheredCells.find((cell) =>
+    cell == state.player
+  );
+
+  if (alreadyHasItem) {
+    return [{ type: "already gathered", item: item, at: state.player }];
+  }
+
+  state.gatheredCells.push(state.player);
+  return [{ type: "gathered", item: item, at: state.player }];
 }
 
 function move(state: GameState, direction: Direction): GameEvent[] {
