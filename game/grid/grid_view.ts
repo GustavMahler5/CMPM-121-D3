@@ -12,6 +12,7 @@ const BUMP_MS = 60;
 const MARKER_COLOR = 0xf5e6a8;
 const BUMP_COLOR = 0xe0533d;
 
+//terrain colors (COMMENTING FOR COMMIT TEST)
 const TERRAIN_COLORS: Record<Terrain, number> = {
   grass: 0x5d9e4a,
   forest: 0x2f6b3a,
