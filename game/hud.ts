@@ -1,4 +1,9 @@
-import { type GameEvent, type GameState, terrainAt } from "../core/mod.ts";
+import {
+  type GameEvent,
+  type GameState,
+  itemAt,
+  terrainAt,
+} from "../core/mod.ts";
 
 function element(id: string): HTMLElement {
   return document.getElementById(id)!;
@@ -35,5 +40,6 @@ export class Hud {
   private showPosition(x: number, y: number) {
     element("position").textContent = `${x}, ${y}`;
     element("terrain").textContent = terrainAt(this.seed, x, y);
+    element("resource").textContent = itemAt(this.seed, x, y) ?? "None";
   }
 }
