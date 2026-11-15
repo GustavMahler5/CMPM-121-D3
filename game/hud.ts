@@ -21,6 +21,10 @@ function describe(event: GameEvent): string {
       return `already gathered ${event.item} at ${event.at.x}, ${event.at.y}`;
     case "nothing to gather":
       return `nothing to gather at ${event.at.x}, ${event.at.y}`;
+    case "crafted":
+      return `crafted ${event.requestedItem} | ${event.inventory}`;
+    case "unable to craft":
+      return `failed to craft ${event.requestedItem} | missing: ${event.missing}`;
   }
 }
 

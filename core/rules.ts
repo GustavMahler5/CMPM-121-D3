@@ -9,6 +9,7 @@ import {
   type Terrain,
   terrainAt,
 } from "./terrain.ts";
+import { RECIPES } from "./mod.ts";
 
 export type Cell = { x: number; y: number };
 
@@ -26,7 +27,8 @@ export type GameState = {
 // Command: https://gameprogrammingpatterns.com/command.html
 export type Command =
   | { type: "move"; direction: Direction }
-  | { type: "gather" };
+  | { type: "gather" }
+  | { type: "craft"; recipe: string };
 
 // Domain Event: https://martinfowler.com/eaaDev/DomainEvent.html
 export type GameEvent =
@@ -34,7 +36,13 @@ export type GameEvent =
   | { type: "blocked"; at: Cell; toward: Cell; terrain: Terrain }
   | { type: "gathered"; item: Item; at: Cell; inventory: Item[] }
   | { type: "already gathered"; item: Item; at: Cell }
-  | { type: "nothing to gather"; at: Cell };
+  | { type: "nothing to gather"; at: Cell }
+  | { type: "crafted"; requestedItem: string; inventory: Item[] }
+  | {
+    type: "unable to craft";
+    requestedItem: string;
+    missing: Record<string, number>;
+  };
 
 const STEPS: Record<Direction, Cell> = {
   north: { x: 0, y: -1 },
@@ -55,6 +63,8 @@ export function apply(state: GameState, command: Command): GameEvent[] {
       return move(state, command.direction);
     case "gather":
       return gather(state);
+    case "craft":
+      return craft();
   }
 }
 
@@ -83,6 +93,33 @@ function gather(state: GameState): GameEvent[] {
     at: currentCell,
     inventory: [...state.inventory],
   }];
+}
+
+function craft(): GameEvent[] {
+  return [];
+}
+
+function _missingIngredients(
+  state: GameState,
+  recipeName: string,
+): Record<string, number> {
+  const requestedRecipe = RECIPES[recipeName];
+  if (!requestedRecipe) return {};
+
+  const missing: Record<string, number> = {};
+
+  for (const [item, required] of Object.entries(requestedRecipe)) {
+    const owned = state.inventory.filter(
+      (ownedItem) => ownedItem == item,
+    ).length;
+    const needed = required - owned;
+
+    if (needed > 0) {
+      missing[item] = needed;
+    }
+  }
+
+  return missing;
 }
 
 function move(state: GameState, direction: Direction): GameEvent[] {

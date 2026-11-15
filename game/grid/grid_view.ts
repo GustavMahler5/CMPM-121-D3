@@ -98,6 +98,10 @@ export class GridView extends Phaser.Scene {
         return this.bump(event.at, event.at);
       case "nothing to gather":
         return this.bump(event.at, event.at);
+      case "crafted":
+        return Promise.resolve();
+      case "unable to craft":
+        return Promise.resolve();
       default:
         // A new event type fails to type-check here until it has a presentation.
         event satisfies never;
