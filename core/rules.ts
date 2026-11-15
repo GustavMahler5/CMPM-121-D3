@@ -26,7 +26,7 @@ export type GameState = {
 // Command: https://gameprogrammingpatterns.com/command.html
 export type Command =
   | { type: "move"; direction: Direction }
-  | { type: "gather"; item: Item };
+  | { type: "gather" };
 
 // Domain Event: https://martinfowler.com/eaaDev/DomainEvent.html
 export type GameEvent =
@@ -54,11 +54,11 @@ export function apply(state: GameState, command: Command): GameEvent[] {
     case "move":
       return move(state, command.direction);
     case "gather":
-      return gather(state, command.item);
+      return gather(state);
   }
 }
 
-function gather(state: GameState, item: Item): GameEvent[] {
+function gather(state: GameState): GameEvent[] {
   const currentCell: Cell = { ...state.player };
   const itemAtCell: Item | undefined = itemAt(
     state.seed,
@@ -72,12 +72,12 @@ function gather(state: GameState, item: Item): GameEvent[] {
     cell.x == currentCell.x && cell.y == currentCell.y
   );
   if (alreadyGatheredHere) {
-    return [{ type: "already gathered", item: item, at: currentCell }];
+    return [{ type: "already gathered", item: itemAtCell, at: currentCell }];
   }
 
   state.gatheredCells.push(currentCell);
-  state.inventory.push(item);
-  return [{ type: "gathered", item: item, at: currentCell }];
+  state.inventory.push(itemAtCell);
+  return [{ type: "gathered", item: itemAtCell, at: currentCell }];
 }
 
 function move(state: GameState, direction: Direction): GameEvent[] {
