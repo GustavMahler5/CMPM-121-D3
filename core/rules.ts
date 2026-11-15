@@ -32,7 +32,7 @@ export type Command =
 export type GameEvent =
   | { type: "moved"; from: Cell; to: Cell }
   | { type: "blocked"; at: Cell; toward: Cell; terrain: Terrain }
-  | { type: "gathered"; item: Item; at: Cell }
+  | { type: "gathered"; item: Item; at: Cell; inventory: Item[] }
   | { type: "already gathered"; item: Item; at: Cell }
   | { type: "nothing to gather"; at: Cell };
 
@@ -77,7 +77,12 @@ function gather(state: GameState): GameEvent[] {
 
   state.gatheredCells.push(currentCell);
   state.inventory.push(itemAtCell);
-  return [{ type: "gathered", item: itemAtCell, at: currentCell }];
+  return [{
+    type: "gathered",
+    item: itemAtCell,
+    at: currentCell,
+    inventory: [...state.inventory],
+  }];
 }
 
 function move(state: GameState, direction: Direction): GameEvent[] {

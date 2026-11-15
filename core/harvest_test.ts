@@ -1,4 +1,4 @@
-import { assert, assertEquals } from "@std/assert";
+import { assert, assertEquals, assertNotEquals } from "@std/assert";
 import { apply, type GameState, isPassable, itemAt, terrainAt } from "./mod.ts";
 
 const SEED = 121;
@@ -54,4 +54,20 @@ Deno.test("gathering twice from the same tile fails", () => {
   assertEquals(state.inventory.length, 1);
   assertEquals(state.gatheredCells[0], { x, y });
   assertEquals(item, state.inventory[0]);
+});
+
+Deno.test("inventory snapshot remains unchanged after inventory update", () => {
+  const state = findItemCell(true);
+  const { x, y } = state.player;
+  const item = itemAt(SEED, x, y);
+  assert(item);
+
+  const event = apply(state, { type: "gather" });
+  const snapshot = event[0];
+  if (snapshot.type != "gathered") throw new Error("Expected a gathered event");
+  state.inventory.pop();
+  assertEquals(item, snapshot.inventory[0]);
+  assertNotEquals(item, state.inventory[0]);
+  assertNotEquals(state.inventory.length, snapshot.inventory.length);
+  assertEquals(state.gatheredCells[0], { x, y });
 });
