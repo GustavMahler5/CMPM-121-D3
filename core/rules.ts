@@ -2,7 +2,13 @@
 // once, and the events it returns are a record of what happened. Whoever called
 // apply() decides how, or whether, to show them over time.
 
-import { isPassable, Item, type Terrain, terrainAt } from "./terrain.ts";
+import {
+  isPassable,
+  Item,
+  itemAt,
+  type Terrain,
+  terrainAt,
+} from "./terrain.ts";
 
 export type Cell = { x: number; y: number };
 
@@ -27,7 +33,8 @@ export type GameEvent =
   | { type: "moved"; from: Cell; to: Cell }
   | { type: "blocked"; at: Cell; toward: Cell; terrain: Terrain }
   | { type: "gathered"; item: Item; at: Cell }
-  | { type: "already gathered"; item: Item; at: Cell };
+  | { type: "already gathered"; item: Item; at: Cell }
+  | { type: "nothing to gather"; at: Cell };
 
 const STEPS: Record<Direction, Cell> = {
   north: { x: 0, y: -1 },
@@ -52,16 +59,25 @@ export function apply(state: GameState, command: Command): GameEvent[] {
 }
 
 function gather(state: GameState, item: Item): GameEvent[] {
-  const alreadyHasItem = state.gatheredCells.find((cell) =>
-    cell == state.player
+  const currentCell: Cell = { ...state.player };
+  const itemAtCell: Item | undefined = itemAt(
+    state.seed,
+    currentCell.x,
+    currentCell.y,
   );
-
-  if (alreadyHasItem) {
-    return [{ type: "already gathered", item: item, at: state.player }];
+  if (!itemAtCell) {
+    return [{ type: "nothing to gather", at: currentCell }];
+  }
+  const alreadyGatheredHere = state.gatheredCells.find((cell) =>
+    cell.x == currentCell.x && cell.y == currentCell.y
+  );
+  if (alreadyGatheredHere) {
+    return [{ type: "already gathered", item: item, at: currentCell }];
   }
 
-  state.gatheredCells.push(state.player);
-  return [{ type: "gathered", item: item, at: state.player }];
+  state.gatheredCells.push(currentCell);
+  state.inventory.push(item);
+  return [{ type: "gathered", item: item, at: currentCell }];
 }
 
 function move(state: GameState, direction: Direction): GameEvent[] {

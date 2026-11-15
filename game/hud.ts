@@ -19,6 +19,8 @@ function describe(event: GameEvent): string {
       return `gathered ${event.item} at ${event.at.x}, ${event.at.y}`;
     case "already gathered":
       return `already gathered ${event.item} at ${event.at.x}, ${event.at.y}`;
+    case "nothing to gather":
+      return `nothing to gather at ${event.at.x}, ${event.at.y}`;
   }
 }
 
