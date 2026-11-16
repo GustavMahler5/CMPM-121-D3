@@ -2,7 +2,7 @@
 // Input, the HUD, sound, and the order of events all live outside it.
 import Phaser from "phaser";
 import type { Cell, GameEvent, GameState, Terrain } from "../../core/mod.ts";
-import { GatherableItem, Item, terrainAt } from "../../core/mod.ts";
+import { GatherableItem, terrainAt } from "../../core/mod.ts";
 import { itemAt } from "../../core/terrain.ts";
 
 export const CELL_SIZE = 32;
@@ -93,7 +93,7 @@ export class GridView extends Phaser.Scene {
       case "blocked":
         return this.bump(event.at, event.toward);
       case "gathered":
-        return this.gather(event.item, event.at);
+        return this.gather();
       case "already gathered":
         return this.bump(event.at, event.at);
       case "nothing to gather":
@@ -120,9 +120,15 @@ export class GridView extends Phaser.Scene {
     });
   }
 
-  private gather(item: Item, at: Cell): Promise<void> {
-    return new Promise(() => {
-      console.log(`gathered ${item} at ${at}`);
+  private gather(): Promise<void> {
+    return new Promise((done) => {
+      this.tweens.add({
+        targets: this.marker,
+        scale: 1.35,
+        duration: 120,
+        yoyo: true,
+        onComplete: () => done(),
+      });
     });
   }
 
