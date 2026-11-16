@@ -2,8 +2,7 @@
 // Input, the HUD, sound, and the order of events all live outside it.
 import Phaser from "phaser";
 import type { Cell, GameEvent, GameState, Terrain } from "../../core/mod.ts";
-import { GatherableItem, terrainAt } from "../../core/mod.ts";
-import { itemAt } from "../../core/terrain.ts";
+import { type GatherableItem, itemAt, terrainAt } from "../../core/mod.ts";
 
 export const CELL_SIZE = 32;
 const VIEW_WIDTH = 800;
@@ -41,6 +40,10 @@ function cellCenter({ x, y }: Cell): Cell {
   };
 }
 
+function cellKey(x: number, y: number): string {
+  return `${x},${y}`;
+}
+
 // One output of the presenter. It shows events; it decides nothing.
 // Humble Object: http://xunitpatterns.com/Humble%20Object.html
 export class GridView extends Phaser.Scene {
@@ -48,11 +51,15 @@ export class GridView extends Phaser.Scene {
   private readonly start: Cell;
   private ground!: Phaser.GameObjects.Graphics;
   private marker!: Phaser.GameObjects.Arc;
+  private readonly gatheredCells: Set<string>;
 
   constructor(state: GameState) {
     super("grid");
     this.seed = state.seed;
     this.start = { ...state.player };
+    this.gatheredCells = new Set(
+      state.gatheredCells.map((cell) => cellKey(cell.x, cell.y)),
+    );
   }
 
   create() {
@@ -93,6 +100,8 @@ export class GridView extends Phaser.Scene {
       case "blocked":
         return this.bump(event.at, event.toward);
       case "gathered":
+        this.gatheredCells.add(cellKey(event.at.x, event.at.y));
+        this.drawCellsAround(event.at);
         return this.gather();
       case "already gathered":
         return this.bump(event.at, event.at);
@@ -167,7 +176,9 @@ export class GridView extends Phaser.Scene {
         );
 
         const item = itemAt(this.seed, x, y);
-        if (item) {
+        const alreadyGathered = this.gatheredCells.has(cellKey(x, y));
+
+        if (item && !alreadyGathered) {
           this.ground.fillStyle(ITEM_COLORS[item as GatherableItem]);
           this.ground.fillCircle(
             x * CELL_SIZE + (CELL_SIZE / 2),

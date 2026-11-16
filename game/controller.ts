@@ -36,6 +36,11 @@ export class Controller {
     addEventListener("blur", () => this.held = []);
   }
 
+  public submit(command: Command): void {
+    this.pressed = command;
+    this.next();
+  }
+
   private keyDown(event: KeyboardEvent) {
     if (event.ctrlKey || event.metaKey || event.altKey) return;
 
