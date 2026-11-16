@@ -2,6 +2,7 @@ import {
   type GameEvent,
   type GameState,
   itemAt,
+  RECIPES,
   terrainAt,
 } from "../core/mod.ts";
 
@@ -36,6 +37,7 @@ export class Hud {
   constructor(state: GameState) {
     this.seed = state.seed;
     this.showPosition(state.player.x, state.player.y);
+    this.createRecipeButtons();
   }
 
   show(event: GameEvent) {
@@ -57,5 +59,20 @@ export class Hud {
     element("position").textContent = `${x}, ${y}`;
     element("terrain").textContent = terrainAt(this.seed, x, y);
     element("resource").textContent = itemAt(this.seed, x, y) ?? "None";
+  }
+
+  private createRecipeButtons() {
+    const recipesDiv = element("recipes");
+
+    for (const [recipe, item] of Object.entries(RECIPES)) {
+      const button = document.createElement("button");
+
+      const needs = Object.entries(item)
+        .map(([item, count]) => `${item}: ${count}`)
+        .join(", ");
+
+      button.textContent = `${recipe} {${needs}}`;
+      recipesDiv.append(button);
+    }
   }
 }
