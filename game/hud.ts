@@ -2,7 +2,6 @@ import {
   type GameEvent,
   type GameState,
   itemAt,
-  RECIPES,
   terrainAt,
 } from "../core/mod.ts";
 
@@ -48,7 +47,6 @@ export class Hud {
       state.gatheredCells.map((cell) => `${cell.x},${cell.y}`),
     );
     this.showPosition(state.player.x, state.player.y);
-    this.createRecipeButtons();
   }
 
   show(event: GameEvent) {
@@ -78,20 +76,5 @@ export class Hud {
     element("resource").textContent = alreadyGathered
       ? "None"
       : (itemAt(this.seed, x, y) ?? "None");
-  }
-
-  private createRecipeButtons() {
-    const recipesDiv = element("recipes");
-
-    for (const [recipe, item] of Object.entries(RECIPES)) {
-      const button = document.createElement("button");
-
-      const needs = Object.entries(item)
-        .map(([item, count]) => `${item}: ${count}`)
-        .join(", ");
-
-      button.textContent = `${recipe} {${needs}}`;
-      recipesDiv.append(button);
-    }
   }
 }
