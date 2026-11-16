@@ -41,7 +41,7 @@ export type GameEvent =
   | {
     type: "unable to craft";
     requestedItem: string;
-    missing: Record<string, number>;
+    missing?: Record<string, number>;
   };
 
 const STEPS: Record<Direction, Cell> = {
@@ -64,7 +64,7 @@ export function apply(state: GameState, command: Command): GameEvent[] {
     case "gather":
       return gather(state);
     case "craft":
-      return craft();
+      return craft(state, command.recipe);
   }
 }
 
@@ -95,11 +95,32 @@ function gather(state: GameState): GameEvent[] {
   }];
 }
 
-function craft(): GameEvent[] {
-  return [];
+function craft(state: GameState, request: string): GameEvent[] {
+  const requested = RECIPES[request];
+  if (!requested) return [{ type: "unable to craft", requestedItem: request }];
+  const missing = missingIngredients(state, request);
+  if (Object.keys(missing).length > 0) {
+    return [{
+      type: "unable to craft",
+      requestedItem: request,
+      missing: missing,
+    }];
+  }
+  for (const [item, required] of Object.entries(requested)) {
+    for (let i = 0; i < required; i++) {
+      const index = state.inventory.indexOf(item as Item);
+      state.inventory.splice(index, 1);
+    }
+  }
+  state.inventory.push(request as Item);
+  return [{
+    type: "crafted",
+    requestedItem: request,
+    inventory: [...state.inventory],
+  }];
 }
 
-function _missingIngredients(
+function missingIngredients(
   state: GameState,
   recipeName: string,
 ): Record<string, number> {

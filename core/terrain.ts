@@ -3,7 +3,9 @@
 
 export type Terrain = "grass" | "forest" | "water" | "rock";
 
-export type Item = "bug" | "stick" | "leaf" | "gem" | "fish";
+export type GatherableItem = "stick" | "gem" | "leaf" | "bug" | "fish";
+export type CraftableItem = "foo" | "bar" | "baz";
+export type Item = GatherableItem | CraftableItem;
 
 const TERRAIN_ITEMS: Record<Terrain, Item[]> = {
   grass: ["bug"],

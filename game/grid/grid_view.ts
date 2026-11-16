@@ -2,7 +2,7 @@
 // Input, the HUD, sound, and the order of events all live outside it.
 import Phaser from "phaser";
 import type { Cell, GameEvent, GameState, Terrain } from "../../core/mod.ts";
-import { Item, terrainAt } from "../../core/mod.ts";
+import { GatherableItem, Item, terrainAt } from "../../core/mod.ts";
 import { itemAt } from "../../core/terrain.ts";
 
 export const CELL_SIZE = 32;
@@ -21,7 +21,7 @@ const TERRAIN_COLORS: Record<Terrain, number> = {
   rock: 0x6e6a66,
 };
 
-const ITEM_COLORS: Record<Item, number> = {
+const ITEM_COLORS: Record<GatherableItem, number> = {
   bug: 0xff0000,
   stick: 0xff8800,
   leaf: 0x00ff00,
@@ -162,7 +162,7 @@ export class GridView extends Phaser.Scene {
 
         const item = itemAt(this.seed, x, y);
         if (item) {
-          this.ground.fillStyle(ITEM_COLORS[item]);
+          this.ground.fillStyle(ITEM_COLORS[item as GatherableItem]);
           this.ground.fillCircle(
             x * CELL_SIZE + (CELL_SIZE / 2),
             y * CELL_SIZE + (CELL_SIZE / 2),
