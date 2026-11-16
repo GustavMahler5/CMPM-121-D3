@@ -32,9 +32,13 @@ function describe(event: GameEvent): string {
 // tools can read. It changes only as events play.
 export class Hud {
   private readonly seed: number;
+  private readonly gatheredCells: Set<string>;
 
   constructor(state: GameState) {
     this.seed = state.seed;
+    this.gatheredCells = new Set(
+      state.gatheredCells.map((cell) => `${cell.x},${cell.y}`),
+    );
     this.showPosition(state.player.x, state.player.y);
   }
 
@@ -42,6 +46,8 @@ export class Hud {
     element("live").textContent = describe(event);
     if (event.type === "moved") this.showPosition(event.to.x, event.to.y);
     if (event.type === "gathered") {
+      this.gatheredCells.add(`${event.at.x},${event.at.y}`);
+      this.showPosition(event.at.x, event.at.y);
       const inventoryList = element("inventory");
       if (!inventoryList) return;
       inventoryList.innerHTML = "";
@@ -56,6 +62,10 @@ export class Hud {
   private showPosition(x: number, y: number) {
     element("position").textContent = `${x}, ${y}`;
     element("terrain").textContent = terrainAt(this.seed, x, y);
-    element("resource").textContent = itemAt(this.seed, x, y) ?? "None";
+    const alreadyGathered = this.gatheredCells.has(`${x},${y}`);
+
+    element("resource").textContent = alreadyGathered
+      ? "None"
+      : (itemAt(this.seed, x, y) ?? "None");
   }
 }
