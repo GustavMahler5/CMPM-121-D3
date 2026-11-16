@@ -9,7 +9,7 @@ import {
   type Terrain,
   terrainAt,
 } from "./terrain.ts";
-import { RECIPES } from "./mod.ts";
+import { RECIPES } from "./recipes.ts";
 
 export type Cell = { x: number; y: number };
 
@@ -120,7 +120,7 @@ function craft(state: GameState, request: string): GameEvent[] {
   }];
 }
 
-function missingIngredients(
+export function missingIngredients(
   state: GameState,
   recipeName: string,
 ): Record<string, number> {

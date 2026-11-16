@@ -9,7 +9,7 @@ const SOUND_FOR: Record<GameEvent["type"], SoundName | null> = {
   gathered: "step",
   "already gathered": "bump",
   "nothing to gather": "bump",
-  "crafted": "bump",
+  "crafted": "chime",
   "unable to craft": "bump",
 };
 
