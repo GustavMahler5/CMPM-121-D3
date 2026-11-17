@@ -143,6 +143,16 @@ export function missingIngredients(
   return missing;
 }
 
+const PASSABLE_WITH: Partial<Record<Terrain, Item>> = {
+  water: "foo",
+};
+
+function canEnter(state: GameState, terrain: Terrain): boolean {
+  if (isPassable(terrain)) return true;
+  const required = PASSABLE_WITH[terrain];
+  return required !== undefined && state.inventory.includes(required);
+}
+
 function move(state: GameState, direction: Direction): GameEvent[] {
   const step = STEPS[direction];
   // Events are retained and played back later, while state keeps changing. So an
@@ -152,7 +162,7 @@ function move(state: GameState, direction: Direction): GameEvent[] {
   const from = { ...state.player };
   const to = { x: from.x + step.x, y: from.y + step.y };
   const terrain = terrainAt(state.seed, to.x, to.y);
-  if (!isPassable(terrain)) {
+  if (!canEnter(state, terrain)) {
     return [{ type: "blocked", at: from, toward: to, terrain }];
   }
   state.player.x = to.x;
