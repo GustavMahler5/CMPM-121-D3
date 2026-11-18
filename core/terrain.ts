@@ -1,6 +1,6 @@
 // The world is a pure function of a seed and coordinates. Nothing here is stored,
 // so the world can be effectively unbounded while saved state stays small.
-import type _Phaser from "npm:phaser@4.2.1";
+// import type _Phaser from "npm:phaser@4.2.1";
 
 export type Terrain = "grass" | "forest" | "water" | "rock";
 
