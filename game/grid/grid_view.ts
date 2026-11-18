@@ -26,6 +26,7 @@ const ITEM_COLORS: Record<GatherableItem, number> = {
   leaf: 0x00ff00,
   gun: 0x3d3934,
   squid: 0xc86d67,
+  // foo: 0x000000,
 };
 
 // Enough cells to cover the view, plus a margin so that the camera can lag behind

@@ -86,3 +86,26 @@ On every push to `main`, a review bot can comment on your commit. It's optional 
 [The workflow](.github/workflows/review-bot.yml) is the whole bot, and the top of that file explains how to set it up or opt out. [`REVIEWBOT.md`](REVIEWBOT.md) tells it what to look for, and it's yours to change.
 
 Its comments are public if your repository is. It runs on a throwaway machine with your code, can browse the web, and spends your own BayLeaf allowance.
+
+# How to Add a Recipe
+
+Navigate to [`core/recipes.ts`](core/recipes.ts). The Record object RECIPES ties string holding the craftable item name and an object whose keys are the items needed and the values being teh quantity of each
+
+```javascript
+ladder: {
+  stick: 4;
+}
+```
+
+This should read as "4 sticks can be crafted into a ladder"
+
+To add a recipe, add another key and add the Recipe object as the value.
+For example, to add a recipe for Calamari using 1 stick and 1 squid, insert...
+
+```javascript
+export const RECIPES: Record<string, Recipe> = {
+  ladder: { stick: 4 },
+  //...
+  calamari: { stick: 1, squid: 1}, 
+};
+```
