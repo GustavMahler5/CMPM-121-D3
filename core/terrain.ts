@@ -26,8 +26,20 @@ export function terrainAt(seed: number, x: number, y: number): Terrain {
 
 export function itemAt(seed: number, x: number, y: number): Item | undefined {
   const terrain = terrainAt(seed, x, y);
+  const itemsInTerrain = TERRAIN_ITEMS[terrain];
 
-  if (noise(seed + 1, x, y, 1) < 0.05) return TERRAIN_ITEMS[terrain][0];
+  if (noise(seed + 1, x, y, 1) < 0.05) {
+    return getRandomItem(itemsInTerrain, seed + 1, x, y);
+  }
+}
+
+function getRandomItem(items: Item[], seed: number, x: number, y: number) {
+  const numOfItems = items.length;
+
+  const randNoise = noise(seed, x, y, 1) * 100;
+  const index = Math.floor(randNoise % numOfItems);
+
+  return items[index];
 }
 
 export function isPassable(terrain: Terrain): boolean {
