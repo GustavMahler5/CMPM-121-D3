@@ -3,15 +3,15 @@
 
 export type Terrain = "grass" | "forest" | "water" | "rock";
 
-export type GatherableItem = "stick" | "gem" | "leaf" | "bug" | "fish";
-export type CraftableItem = "foo" | "bar" | "baz";
+export type GatherableItem = "stick" | "gun" | "leaf" | "blood" | "squid";
+export type CraftableItem = "ladder" | "raft" | "pen" | "warrant";
 export type Item = GatherableItem | CraftableItem;
 
-const TERRAIN_ITEMS: Record<Terrain, Item[]> = {
-  grass: ["bug"],
+export const TERRAIN_ITEMS: Record<Terrain, Item[]> = {
+  grass: ["blood"],
   forest: ["stick", "leaf"],
-  rock: ["gem"],
-  water: ["fish"],
+  rock: ["gun"],
+  water: ["squid"],
 };
 
 export function terrainAt(seed: number, x: number, y: number): Terrain {
@@ -42,8 +42,15 @@ function getRandomItem(items: Item[], seed: number, x: number, y: number) {
   return items[index];
 }
 
-export function isPassable(terrain: Terrain): boolean {
-  return terrain !== "water" && terrain !== "rock";
+const PASSABLE_WITH: Partial<Record<Terrain, Item>> = {
+  water: "raft",
+  rock: "ladder",
+};
+
+export function isPassable(inventory: Item[], terrain: Terrain): boolean {
+  if (terrain !== "water" && terrain !== "rock") return true;
+  const required = PASSABLE_WITH[terrain];
+  return required !== undefined && inventory.includes(required);
 }
 
 // Value noise: random numbers at coarse grid points, blended between them, so

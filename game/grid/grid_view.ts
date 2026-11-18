@@ -14,18 +14,18 @@ const BUMP_COLOR = 0xe0533d;
 
 //terrain colors (COMMENTING FOR COMMIT TEST)
 const TERRAIN_COLORS: Record<Terrain, number> = {
-  grass: 0x5d9e4a,
-  forest: 0x2f6b3a,
-  water: 0x2d5f9e,
+  grass: 0x7c9c73,
+  forest: 0x334f35,
+  water: 0x455f99,
   rock: 0x6e6a66,
 };
 
 const ITEM_COLORS: Record<GatherableItem, number> = {
-  bug: 0xff0000,
-  stick: 0xff8800,
+  blood: 0x420506,
+  stick: 0x4f3317,
   leaf: 0x00ff00,
-  gem: 0x0000ff,
-  fish: 0x00ffff,
+  gun: 0x3d3934,
+  squid: 0xc86d67,
 };
 
 // Enough cells to cover the view, plus a margin so that the camera can lag behind
@@ -110,6 +110,8 @@ export class GridView extends Phaser.Scene {
       case "crafted":
         return Promise.resolve();
       case "unable to craft":
+        return Promise.resolve();
+      case "game over":
         return Promise.resolve();
       default:
         // A new event type fails to type-check here until it has a presentation.

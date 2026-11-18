@@ -23,26 +23,26 @@ function giveNecessaryItems(state: GameState, request: CraftableItem): number {
   return total;
 }
 
-Deno.test("successfully crafts a foo", () => {
+Deno.test("successfully crafts a ladder", () => {
   const state = newGame(SEED);
 
-  const numItems: number = giveNecessaryItems(state, "foo");
+  const numItems: number = giveNecessaryItems(state, "ladder");
   assertEquals(state.inventory.length, numItems);
 
-  const events = apply(state, { type: "craft", recipe: "foo" });
+  const events = apply(state, { type: "craft", recipe: "ladder" });
   assert(events[0].type == "crafted");
-  assertEquals(state.inventory, ["foo"]);
-  assert(state.inventory[0] == "foo");
+  assertEquals(state.inventory, ["ladder"]);
+  assert(state.inventory[0] == "ladder");
 });
 
 Deno.test("fails to craft with one missing ingredient", () => {
   const state = newGame(SEED);
 
-  giveNecessaryItems(state, "foo");
+  giveNecessaryItems(state, "ladder");
   state.inventory.pop();
   const startingInventory = [...state.inventory];
 
-  const events = apply(state, { type: "craft", recipe: "foo" });
+  const events = apply(state, { type: "craft", recipe: "ladder" });
   assert(events[0].type == "unable to craft");
   assertEquals(state.inventory, startingInventory);
 });

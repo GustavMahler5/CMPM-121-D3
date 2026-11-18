@@ -32,6 +32,8 @@ function describe(event: GameEvent): string {
         ? `Cannot craft ${event.requestedItem}: missing ${missing}`
         : `Unknown recipe: ${event.requestedItem}`;
     }
+    case "game over":
+      return "crafted a warrant. Game";
   }
 }
 

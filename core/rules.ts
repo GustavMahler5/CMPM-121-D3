@@ -22,6 +22,7 @@ export type GameState = {
   player: Cell;
   inventory: Item[];
   gatheredCells: Cell[];
+  gameComplete: boolean;
 };
 
 // Command: https://gameprogrammingpatterns.com/command.html
@@ -38,6 +39,7 @@ export type GameEvent =
   | { type: "already gathered"; item: Item; at: Cell }
   | { type: "nothing to gather"; at: Cell }
   | { type: "crafted"; requestedItem: string; inventory: Item[] }
+  | { type: "game over" }
   | {
     type: "unable to craft";
     requestedItem: string;
@@ -53,11 +55,20 @@ const STEPS: Record<Direction, Cell> = {
 
 // Singleton, avoided on purpose: tests make as many games as they need. https://gameprogrammingpatterns.com/singleton.html
 export function newGame(seed: number): GameState {
-  return { seed, player: { x: 0, y: 0 }, inventory: [], gatheredCells: [] };
+  return {
+    seed,
+    player: { x: 0, y: 0 },
+    inventory: [],
+    gatheredCells: [],
+    gameComplete: false,
+  };
 }
 
 // The single way in. It updates the state it is given and returns the events.
 export function apply(state: GameState, command: Command): GameEvent[] {
+  if (state.gameComplete) {
+    return [];
+  }
   switch (command.type) {
     case "move":
       return move(state, command.direction);
@@ -113,6 +124,12 @@ function craft(state: GameState, request: string): GameEvent[] {
     }
   }
   state.inventory.push(request as Item);
+  if (request == "warrant") {
+    state.gameComplete = true;
+    return [{
+      type: "game over",
+    }];
+  }
   return [{
     type: "crafted",
     requestedItem: request,
@@ -143,16 +160,6 @@ export function missingIngredients(
   return missing;
 }
 
-const PASSABLE_WITH: Partial<Record<Terrain, Item>> = {
-  water: "foo",
-};
-
-function canEnter(state: GameState, terrain: Terrain): boolean {
-  if (isPassable(terrain)) return true;
-  const required = PASSABLE_WITH[terrain];
-  return required !== undefined && state.inventory.includes(required);
-}
-
 function move(state: GameState, direction: Direction): GameEvent[] {
   const step = STEPS[direction];
   // Events are retained and played back later, while state keeps changing. So an
@@ -162,7 +169,7 @@ function move(state: GameState, direction: Direction): GameEvent[] {
   const from = { ...state.player };
   const to = { x: from.x + step.x, y: from.y + step.y };
   const terrain = terrainAt(state.seed, to.x, to.y);
-  if (!canEnter(state, terrain)) {
+  if (!isPassable(state.inventory, terrain)) {
     return [{ type: "blocked", at: from, toward: to, terrain }];
   }
   state.player.x = to.x;

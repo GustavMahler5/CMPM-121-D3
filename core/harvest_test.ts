@@ -5,7 +5,7 @@ const SEED = 121;
 
 function findItemCell(requestItemCell: boolean): GameState {
   for (let x = 2; x < 10_000; x++) {
-    const here = isPassable(terrainAt(SEED, x, 0));
+    const here = isPassable([], terrainAt(SEED, x, 0));
     const item = itemAt(SEED, x, 0);
     if (here && Boolean(item) == requestItemCell) {
       return {
@@ -13,6 +13,7 @@ function findItemCell(requestItemCell: boolean): GameState {
         player: { x, y: 0 },
         inventory: [],
         gatheredCells: [],
+        gameComplete: false,
       };
     }
   }
